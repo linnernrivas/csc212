@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="Project01/src"/>
+	<classpathentry kind="src" path="Project02/src"/>
+	<classpathentry kind="lib" path="Project02/Rivas-Linner.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="Project01/bin"/>
+</classpath>

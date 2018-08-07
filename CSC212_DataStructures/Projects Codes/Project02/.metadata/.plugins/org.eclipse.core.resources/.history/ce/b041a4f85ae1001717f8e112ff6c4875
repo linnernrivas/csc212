@@ -1,0 +1,220 @@
+import java.io.*;
+import java.net.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.security.*;
+import javax.crypto.*;
+
+public class Server extends JFrame {
+	
+	private JTextField userText;
+	private JTextArea chatWindow;
+	private JButton submit;
+	private ObjectOutputStream output;
+	private ObjectInputStream input;
+	private ServerSocket server;
+	private Socket connection;
+	
+	//constructor
+	public Server() {
+		super("Server Instant Messenger");
+		
+		userText = new JTextField();
+		userText.setEditable(false);
+		userText.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent event) {
+						sendMessage(event.getActionCommand());
+						userText.setText("");
+					}
+				}
+		);
+		
+		add(userText, BorderLayout.SOUTH);
+		submit =new JButton();
+		chatWindow = new JTextArea();
+		add(new JScrollPane(chatWindow), BorderLayout.CENTER);
+		chatWindow.setSize(360,100);//setSize(900, 50);
+		setVisible(true);
+		
+	}
+	
+	//set up and run the server
+	public void startRunning() {
+		try {
+			server = new ServerSocket(12345, 100); //265 is port number. 10 is how many people waiting in connect to chat
+			while(true) {
+				try {
+					waitForConnection();
+					setupStreams();
+					whileChatting();
+				}catch(EOFException eofException) {
+					showMessage("\n Server ended the connection! ");
+				}finally {
+					closeAll();
+				}
+			}
+		}catch(IOException ioException) {
+			ioException.printStackTrace();
+		}
+	}
+	
+	//wait for  connection, then display connection information
+	private void waitForConnection() throws IOException{
+		showMessage("waiting for someone to connect... \n");
+		connection = server.accept(); 
+		showMessage("Now connected to " + connection.getInetAddress().getHostName());
+	}
+	
+	//get stream to send and receive data
+	private void setupStreams() throws IOException{
+		output = new ObjectOutputStream(connection.getOutputStream());
+		output.flush();
+		input = new ObjectInputStream(connection.getInputStream());
+		showMessage("\n Streams are now setup! \n");
+		
+	}
+	
+	//during chat
+	private void whileChatting() throws IOException{
+		String message = "You are now connected!";
+		sendMessage(message);
+		ableToType(true);
+		do {
+			try {
+				message = (String) input.readObject();
+				showMessage("\n" + message);
+			}catch(ClassNotFoundException classNotFoundException){
+				showMessage("\n unsure what user sent");
+			}
+		}while(!message.equals("CLIENT - END"));
+	}
+		
+	//close streams and sockets after chat
+		public void closeAll() {
+			showMessage("\n Closing connections... \n");
+			ableToType(false);
+			try {
+				output.close();
+				input.close();
+				connection.close();
+			}catch(IOException ioException) {
+				ioException.printStackTrace();
+			}
+		}
+		
+		//send a message to client
+		private void sendMessage(String message) {
+			try {
+				output.writeObject("SERVER - " + message);
+				output.flush();
+				showMessage("\n SERVER - " + message);
+			}catch(IOException ioException) {
+				chatWindow.append("\n ERROR: CANNOT SEND MESSAGE");
+			}
+		}
+		//updates chatWindow
+		private void showMessage(final String text) {
+			SwingUtilities.invokeLater(
+				new Runnable() {
+					public void run() {
+						chatWindow.append(text);
+					}
+				}
+			);
+		}
+		
+		//allow user to type
+		private void ableToType(final boolean tof) {
+			SwingUtilities.invokeLater(
+				new Runnable() {
+					public void run() {
+						userText.setEditable(tof);
+					}
+				}
+			);
+		}
+		   public static String encrypto(String inp) {
+
+		        if(inp == "" || inp == null)
+		            return inp;
+		        
+		        try{
+		            byte[] textEncrypted;   
+
+		            KeyGenerator keygenerator = KeyGenerator.getInstance("DES");
+
+		            byte[] desKeyData = KEY.getBytes("ISO-8859-1");
+		            DESKeySpec desKeySpec = new DESKeySpec(desKeyData);
+		            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+		            SecretKey myDesKey = keyFactory.generateSecret(desKeySpec);
+		            
+		            Cipher desCipher;
+
+		            desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+		            
+		            desCipher.init(Cipher.ENCRYPT_MODE, myDesKey);
+
+		            byte[] text = inp.getBytes("ISO-8859-1");
+		            textEncrypted = desCipher.doFinal(text);
+
+
+		            return new String(textEncrypted, "ISO-8859-1") ;
+		            
+		        }catch(Exception e) {
+
+		            return  null;
+		        }
+		        
+		    }
+
+		    public static String decrypto(String response)
+		    {   
+		        if(response == "" || response == null)
+		            return response;
+
+		        try {
+		            
+		            byte[] desKeyData2 = KEY.getBytes("ISO-8859-1");
+		            byte[] textEncrypted = response.getBytes("ISO-8859-1");
+		            Cipher desCipher;
+		            desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+
+
+		            DESKeySpec desKeySpec2 = new DESKeySpec(desKeyData2);
+		            SecretKeyFactory keyFactory2 = SecretKeyFactory.getInstance("DES");
+		            SecretKey myDesKey2 = keyFactory2.generateSecret(desKeySpec2);
+		            
+		            desCipher.init(Cipher.DECRYPT_MODE, myDesKey2);
+		            
+		            byte[] textDecrypted = desCipher.doFinal(textEncrypted);
+		            
+
+		            String temp = new String(textDecrypted, "ISO-8859-1");
+		            return temp;
+		        }
+
+		        catch(Exception e) {
+		            return null;
+		        }
+		    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

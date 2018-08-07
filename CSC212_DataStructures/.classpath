@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="Projects Codes/Project00-Linner Rivas/src"/>
+	<classpathentry kind="src" path="Projects Codes/Project01/src"/>
+	<classpathentry kind="src" path="Projects Codes/Project02/src"/>
+	<classpathentry kind="src" path="Projects Codes/Project03-Rivas-Linner/Project03"/>
+	<classpathentry kind="lib" path="Projects Codes/Project00-Linner Rivas/Jar_file/Project00----Rivas-Linner.jar"/>
+	<classpathentry kind="lib" path="Projects Codes/Project02/Rivas-Linner.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="Projects Codes/Project00-Linner Rivas/bin"/>
+</classpath>
